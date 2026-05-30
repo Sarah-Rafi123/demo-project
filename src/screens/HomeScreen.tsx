@@ -41,7 +41,11 @@ export default function HomeScreen() {
           {detector.mode === "tap" ? (
             <TapPad onTap={detector.tapVerdict} />
           ) : (
-            <VoiceControl status={detector.status} onPress={detector.startVoice} />
+            <VoiceControl
+              status={detector.status}
+              onPressIn={detector.startVoice}
+              onPressOut={detector.endVoice}
+            />
           )}
         </View>
       </View>

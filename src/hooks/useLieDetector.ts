@@ -15,6 +15,7 @@ export interface LieDetectorState {
   setMode: (mode: Mode) => void;
   tapVerdict: (verdict: Verdict) => void;
   startVoice: () => void;
+  endVoice: () => void;
   reset: () => void;
 }
 
@@ -30,13 +31,10 @@ export function useLieDetector(): LieDetectorState {
   const { trigger, tap } = useHaptics();
 
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const voiceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearTimers = useCallback(() => {
     if (flashTimer.current) clearTimeout(flashTimer.current);
-    if (voiceTimer.current) clearTimeout(voiceTimer.current);
     flashTimer.current = null;
-    voiceTimer.current = null;
   }, []);
 
   const fire = useCallback(
@@ -67,10 +65,12 @@ export function useLieDetector(): LieDetectorState {
     setFlash(null);
     setStatus("listening");
     tap();
-    voiceTimer.current = setTimeout(() => {
-      fire(randomVerdict());
-    }, 1800);
-  }, [clearTimers, fire, status, tap]);
+  }, [clearTimers, status, tap]);
+
+  const endVoice = useCallback(() => {
+    if (status !== "listening") return;
+    fire(randomVerdict());
+  }, [fire, status]);
 
   const reset = useCallback(() => {
     clearTimers();
@@ -91,5 +91,5 @@ export function useLieDetector(): LieDetectorState {
     [clearTimers, mode],
   );
 
-  return { mode, status, verdict, flash, setMode, tapVerdict, startVoice, reset };
+  return { mode, status, verdict, flash, setMode, tapVerdict, startVoice, endVoice, reset };
 }

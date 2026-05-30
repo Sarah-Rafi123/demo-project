@@ -10,10 +10,11 @@ import Animated, {
 
 interface Props {
   status: "idle" | "listening" | "settling" | "result";
-  onPress: () => void;
+  onPressIn: () => void;
+  onPressOut: () => void;
 }
 
-export default function VoiceControl({ status, onPress }: Props) {
+export default function VoiceControl({ status, onPressIn, onPressOut }: Props) {
   const ring = useSharedValue(0);
 
   useEffect(() => {
@@ -45,10 +46,10 @@ export default function VoiceControl({ status, onPress }: Props) {
           style={ringStyle}
         />
         <Pressable
-          onPress={onPress}
-          disabled={listening}
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}
           accessibilityRole="button"
-          accessibilityLabel={listening ? "Listening" : "Tap to speak"}
+          accessibilityLabel={listening ? "Listening, release to get result" : "Hold to speak"}
           className={`h-28 w-28 rounded-full items-center justify-center border-2 ${
             listening
               ? "bg-sky-500 border-sky-300"
@@ -59,10 +60,10 @@ export default function VoiceControl({ status, onPress }: Props) {
         </Pressable>
       </View>
       <Text className="mt-5 text-slate-300 text-base">
-        {listening ? "Listening..." : "Tap and say something"}
+        {listening ? "Listening... release to decide" : "Hold to speak"}
       </Text>
       <Text className="mt-1 text-slate-500 text-xs text-center px-4">
-        Speak any short sentence — the meter will decide.
+        Press and hold the mic, speak your sentence, then release.
       </Text>
     </View>
   );
