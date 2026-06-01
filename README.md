@@ -6,7 +6,7 @@ A polished mobile lie detector app built with React Native and Expo. Switch betw
 
 - Tap / Voice mode toggle at the top of the screen
 - **Tap Mode**: tap the left "TRUTH" pad or the right "LIE" pad to trigger a verdict
-- **Voice Mode**: tap the mic, speak any short sentence, and the meter returns a ~50/50 random verdict
+- **Voice Mode**: hold the mic and speak a short sentence; speech is captured with the device's speech recognition, the live transcript is shown, and the meter returns a ~50/50 random verdict
 - Animated semicircular gauge with a needle that springs to the chosen side
 - Color-coded full-screen flash (green for truth, red for lie)
 - Sound effects per verdict (ding for truth, buzzer for lie)
@@ -15,19 +15,20 @@ A polished mobile lie detector app built with React Native and Expo. Switch betw
 
 ## Tech Stack
 
-- React Native + Expo (SDK 56)
+- React Native + Expo (SDK 54)
 - TypeScript
 - NativeWind v4 (Tailwind CSS for React Native)
 - React Native Reanimated for animations
 - React Native SVG for the meter
 - expo-audio for sound playback
+- expo-speech-recognition for voice capture
 - expo-haptics for vibration feedback
 
 ## Requirements
 
 - Node.js 18+
 - npm
-- Expo Go on a device, or an Android emulator / iOS simulator
+- A development build on a device or emulator. Voice Mode uses native speech recognition, so it does not run in Expo Go.
 
 ## Setup
 
@@ -37,18 +38,14 @@ npm install
 
 ## Running
 
-```bash
-npm start
-```
-
-Then press `a` to open on Android, `i` for iOS, or scan the QR code with Expo Go.
-
-Run a platform directly:
+Voice Mode relies on native speech recognition, so run a development build directly on a device or emulator:
 
 ```bash
 npm run android
 npm run ios
 ```
+
+The first run compiles the native project and applies the microphone and speech-recognition permissions. Tap Mode also works under `npm start`, but Voice Mode requires the development build above.
 
 ## Building an APK
 
@@ -80,7 +77,8 @@ npx eas build --platform android --profile preview
 │   ├── hooks/
 │   │   ├── useHaptics.ts         Wraps expo-haptics
 │   │   ├── useLieDetector.ts     State machine: mode, status, verdict, flash
-│   │   └── useSound.ts           Preloads and plays verdict sounds
+│   │   ├── useSound.ts           Preloads and plays verdict sounds
+│   │   └── useSpeechRecognition.ts  Wraps expo-speech-recognition events
 │   ├── lib/
 │   │   └── random.ts             Random verdict helper
 │   ├── screens/
@@ -102,12 +100,13 @@ npx eas build --platform android --profile preview
 | react-native-svg | Semicircular gauge rendering |
 | react-native-safe-area-context | Safe area handling |
 | expo-audio | Truth / lie sound effects |
+| expo-speech-recognition | Voice capture and transcription |
 | expo-haptics | Vibration feedback on verdicts |
 
 ## Notes on Voice Mode
 
-Voice Mode uses a press-to-speak UI with a listening animation, then returns a random Truth or Lie verdict (~50/50). It does not transcribe audio; integrating live speech recognition (e.g. `expo-speech-recognition`) requires a custom dev / EAS build and was out of scope for this submission.
+Hold the mic button to start recognition, speak a short sentence, and release. The captured transcript is shown live, and once speech is recognized the meter returns a random Truth or Lie verdict (~50/50). If permission is denied or no speech is detected, the app shows a short prompt and does not return a verdict. Recognition runs through the platform speech service (`expo-speech-recognition`), so a development build is required — it does not run in Expo Go.
 
 ## Time Taken
 
-Approximately 5 hours end-to-end (scaffold + feature work + polish).
+Approximately 6 hours end-to-end (scaffold + feature work + voice recognition + polish).
