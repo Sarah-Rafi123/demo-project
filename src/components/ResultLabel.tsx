@@ -34,12 +34,14 @@ export default function ResultLabel({ verdict, status }: Props) {
 
   const helper =
     status === "listening"
-      ? "Analyzing voice..."
-      : status === "idle"
-        ? "Awaiting input"
-        : verdict === "truth"
-          ? "Statement detected as truth"
-          : "Statement detected as lie";
+      ? "Listening..."
+      : status === "settling"
+        ? "Analyzing voice..."
+        : status === "idle"
+          ? "Awaiting input"
+          : verdict === "truth"
+            ? "Statement detected as truth"
+            : "Statement detected as lie";
 
   const title = verdict === "truth" ? "TRUTH" : verdict === "lie" ? "LIE" : "—";
   const titleColor =

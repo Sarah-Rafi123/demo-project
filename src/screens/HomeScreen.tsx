@@ -43,6 +43,8 @@ export default function HomeScreen() {
           ) : (
             <VoiceControl
               status={detector.status}
+              transcript={detector.transcript}
+              error={detector.voiceError}
               onPressIn={detector.startVoice}
               onPressOut={detector.endVoice}
             />

@@ -10,11 +10,19 @@ import Animated, {
 
 interface Props {
   status: "idle" | "listening" | "settling" | "result";
+  transcript: string;
+  error: string | null;
   onPressIn: () => void;
   onPressOut: () => void;
 }
 
-export default function VoiceControl({ status, onPressIn, onPressOut }: Props) {
+export default function VoiceControl({
+  status,
+  transcript,
+  error,
+  onPressIn,
+  onPressOut,
+}: Props) {
   const ring = useSharedValue(0);
 
   useEffect(() => {
@@ -36,6 +44,13 @@ export default function VoiceControl({ status, onPressIn, onPressOut }: Props) {
   }));
 
   const listening = status === "listening";
+  const settling = status === "settling";
+
+  const caption = listening
+    ? "Listening... release to decide"
+    : settling
+      ? "Analyzing your statement..."
+      : "Hold to speak";
 
   return (
     <View className="items-center w-full" style={{ minHeight: 200 }}>
@@ -48,23 +63,36 @@ export default function VoiceControl({ status, onPressIn, onPressOut }: Props) {
         <Pressable
           onPressIn={onPressIn}
           onPressOut={onPressOut}
+          disabled={settling}
           accessibilityRole="button"
           accessibilityLabel={listening ? "Listening, release to get result" : "Hold to speak"}
           className={`h-28 w-28 rounded-full items-center justify-center border-2 ${
             listening
               ? "bg-sky-500 border-sky-300"
-              : "bg-slate-800 border-slate-600 active:bg-slate-700"
+              : settling
+                ? "bg-slate-700 border-slate-500"
+                : "bg-slate-800 border-slate-600 active:bg-slate-700"
           }`}
         >
-          <Text className="text-3xl">{listening ? "..." : "🎙"}</Text>
+          <Text className="text-3xl">{listening ? "..." : settling ? "⋯" : "🎙"}</Text>
         </Pressable>
       </View>
-      <Text className="mt-5 text-slate-300 text-base">
-        {listening ? "Listening... release to decide" : "Hold to speak"}
-      </Text>
-      <Text className="mt-1 text-slate-500 text-xs text-center px-4">
-        Press and hold the mic, speak your sentence, then release.
-      </Text>
+
+      <Text className="mt-5 text-slate-300 text-base">{caption}</Text>
+
+      {transcript.length > 0 ? (
+        <Text className="mt-3 text-slate-100 text-sm text-center px-6 italic">
+          “{transcript}”
+        </Text>
+      ) : (
+        <Text className="mt-1 text-slate-500 text-xs text-center px-4">
+          Press and hold the mic, speak your sentence, then release.
+        </Text>
+      )}
+
+      {error ? (
+        <Text className="mt-3 text-red-400 text-xs text-center px-6">{error}</Text>
+      ) : null}
     </View>
   );
 }
